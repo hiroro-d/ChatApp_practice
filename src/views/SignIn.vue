@@ -2,6 +2,10 @@
   <v-container>
     <v-row>
       <v-col cols="12">
+         <v-text-field
+            label="Name*"
+            v-model="name"
+        ></v-text-field>
         <v-text-field
             label="Email*"
             v-model="email"
@@ -24,30 +28,34 @@
 
 <script>
 import firebaseApp from '@/firebase/firebase.js'
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, updateProfile, } from "firebase/auth";
 
 const auth = getAuth(firebaseApp)
 
 export default {
   data: () => ({
+    name: '',
     email: '',
     pw: ''
   }),
   methods: {
-    createUser: function () {
+    createUser() {
       createUserWithEmailAndPassword(auth, this.email, this.pw)
-        .then((userCredential) => {
-          const user = userCredential.user
+        .then((res) => {
+          const user = res.user
           console.log('create user success.' + user)
           alert('作成成功')
-          this.$router.push('/mypage')
+          updateProfile(auth.currentUser, {
+            displayName: this.name
+          }).then(() => {
+            return
+          }).catch((error) => {
+            return error
+          })
+          this.$router.push('/login')
         })
         .catch((error) => {
-          const errorCode = error.code
-          const errorMessage = error.message
-          console.log('errorCode: ' + errorCode)
-          console.log('errorMessage: ' + errorMessage)
-          alert('作成失敗')
+          alert('作成失敗', error)
         })
     }
   }

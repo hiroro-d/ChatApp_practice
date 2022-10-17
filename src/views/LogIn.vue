@@ -61,20 +61,21 @@ export default {
     pw: ''
   }),
   methods: {
-    login: function () {
+    login() {
       signInWithEmailAndPassword(auth, this.email, this.pw)
-        .then((userCredential) => {
-          const user = userCredential.user
+        .then((res) => {
+          const user = res.user
           console.log('create user success.' + user)
+          this.$refs.form.reset();
           // ★成功レスポンスだった場合は『this.$router.push('/top')』で遷移します
+          const userInfo = {
+            displayName: user.displayName,
+          }
+          sessionStorage.setItem('userInfo', JSON.stringify(userInfo))
           this.$router.push('/mypage')
         })
         .catch((error) => {
-          const errorCode = error.code
-          const errorMessage = error.message
-          console.log('errorCode: ' + errorCode)
-          console.log('errorMessage: ' + errorMessage)
-          alert('認証失敗')
+          alert('認証失敗', error)
         })
     }
   }
